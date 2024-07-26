@@ -24,6 +24,7 @@ app.use(errorHandlerMiddleware);
 
 
 
+
 // server initialization
 const start = async () => {
     try {
