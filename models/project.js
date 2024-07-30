@@ -24,6 +24,10 @@ const projectSchema = mongoose.Schema({
     collabSkills: {
         type: [String]
     },
+    likes: {
+        type: Number,
+        default: 0
+    },
     collaborators: {
         type: [[String]]
     }

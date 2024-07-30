@@ -6,10 +6,19 @@ const {
     getAllTechnologies,
     postAllTechnologies,
     addProject,
-    getProject
+    getProject,
+    getProjectByID,
+    addKanban,
+    getKanbanByProjectID,
+    updateLikes
 } = require('../controllers/project');
 
 router.route('/').get(getProject).post(addProject);
+router.route('/id/:id').get(getProjectByID);
 router.route('/technologies').get(getAllTechnologies).post(postAllTechnologies);
+router.route('/kanban').post(addKanban);
+router.route('/kanban/:projectId').get(getKanbanByProjectID);
+router.route('/likes').post(updateLikes);
+
 
 module.exports = router;

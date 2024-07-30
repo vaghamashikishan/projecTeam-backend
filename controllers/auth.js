@@ -11,7 +11,6 @@ const addNewUserToDB = async (req, res, next) => {
 
     // checking if user is already stored then we will not store again
     const user = await userModal.findOne({ supabaseId: data.supabaseId });
-    console.log(user);
     if (!user) {
         const result = await userModal.create(data);
         res.status(status_codes.StatusCodes.CREATED).json(result);

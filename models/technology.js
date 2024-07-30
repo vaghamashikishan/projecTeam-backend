@@ -7,6 +7,6 @@ const TechnologySchema = new mongoose.Schema({
     }
 });
 
-const Technology = mongoose.model('Technology', TechnologySchema);
+const Technology = mongoose.model('technology', TechnologySchema);
 
 module.exports = Technology;
