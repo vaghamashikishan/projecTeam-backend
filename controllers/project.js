@@ -2,6 +2,8 @@ const status_codes = require('http-status-codes');
 const Technology = require('../models/technology');
 const Project = require('../models/project');
 const Kanban = require('../models/kanban');
+const CollabRequest = require('../models/collab-request');
+const Collab = require('../models/collab');
 
 const getAllTechnologies = async (req, res) => {
     const technologies = await Technology.find();
@@ -60,6 +62,62 @@ const updateLikes = async (req, res) => {
     res.status(status_codes.StatusCodes.OK).json({ msg: "Updated your like" });
 }
 
+const addCollabRequest = async (req, res) => {
+    const collabData = req.body;
+
+    let msg = "";
+    const existData = await CollabRequest.find({ projectId: collabData.projectId, requestUserId: collabData.requestUserId });
+    if (existData.length > 0) {
+        msg = "Request has already been sent."
+    } else {
+        const result = await CollabRequest.create(collabData);
+        msg = "Request sended successfully.";
+    }
+    res.status(status_codes.StatusCodes.OK).json({ msg: msg });
+}
+
+const getCollabRequestsForUser = async (req, res) => {
+    const userId = req.params.userId;
+    const allCollabData = await CollabRequest.find({ ownerId: userId });
+    res.status(status_codes.StatusCodes.OK).json({ data: allCollabData });
+}
+
+const handleCollabRequestsForUser = async (req, res) => {
+    const { collabId, isAccepted } = req.body;
+
+    if (isAccepted === "true") {
+        const collabData = await CollabRequest.findById(collabId);
+        const { projectId, requestUserId, requestUserName } = collabData;
+        const project = await Project.findById(projectId);
+        const allUserCollabration = await Collab.find({ collabratorId: requestUserId });
+        const userExists = project.collaborators.some(
+            collaborator => collaborator[0] === requestUserId
+        );
+
+        if (!userExists) {
+            project.collaborators.push([requestUserId, requestUserName]);
+            await project.save();
+
+            if (allUserCollabration.length == 0) {
+                const data = {
+                    collabratorId: requestUserId,
+                    projects: [projectId]
+                }
+                await Collab.create(data);
+            } else {
+                allUserCollabration[0].projects.push(projectId);
+                await allUserCollabration[0].save()
+            }
+        }
+    }
+
+    const result = await CollabRequest.findByIdAndDelete(collabId);
+    let msg = "Collabrator request rejected successfully.";
+    if (isAccepted === 'true')
+        msg = "Collabrator request accepted successfully.";
+    res.status(status_codes.StatusCodes.OK).json({ msg: msg });
+}
+
 module.exports = {
     getAllTechnologies,
     postAllTechnologies,
@@ -68,5 +126,8 @@ module.exports = {
     getProjectByID,
     getKanbanByProjectID,
     addKanban,
-    updateLikes
+    updateLikes,
+    addCollabRequest,
+    getCollabRequestsForUser,
+    handleCollabRequestsForUser
 }

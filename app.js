@@ -9,6 +9,7 @@ const errorHandlerMiddleware = require('./middlewares/errorHandler');
 // routes import
 const authRouter = require('./routes/auth');
 const projectRouter = require('./routes/project');
+const dashboard = require('./routes/dashboard')
 
 const port = process.env.PORT || 3000;
 const connectToDB = require('./db/connect');
@@ -18,6 +19,7 @@ app.use(cors());
 
 app.use('/api/auth', authRouter);
 app.use('/api/project', projectRouter);
+app.use('/api/dashboard', dashboard);
 
 // To handle errors
 app.use(errorHandlerMiddleware);
