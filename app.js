@@ -13,13 +13,14 @@ const dashboard = require('./routes/dashboard')
 
 const port = process.env.PORT || 3000;
 const connectToDB = require('./db/connect');
+const authorizationMiddleware = require('./middlewares/auth');
 
 app.use(express.json());
 app.use(cors());
 
 app.use('/api/auth', authRouter);
-app.use('/api/project', projectRouter);
-app.use('/api/dashboard', dashboard);
+app.use('/api/project', authorizationMiddleware, projectRouter);
+app.use('/api/dashboard', authorizationMiddleware, dashboard);
 
 // To handle errors
 app.use(errorHandlerMiddleware);
